@@ -1,0 +1,47 @@
+apply plugin:'application'
+apply plugin: 'java'
+
+version = '0.1'
+
+
+mainClassName = "org.nosoft.bddownloader.BDDownloader"
+
+repositories {
+        mavenCentral()
+        maven { url "http://download.eclipse.org/rt/eclipselink/maven.repo" }
+}
+
+
+compileJava.options.compilerArgs = ['-Xlint:unchecked','-Xlint:deprecation']
+
+dependencies {
+
+        compile 'com.fasterxml.jackson.core:jackson-core:2.2.2'
+        compile 'com.fasterxml.jackson.core:jackson-databind:2.2.2'
+        compile 'com.mpatric:mp3agic:0.8.1'
+        compile 'jline:jline:2.11'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+}
+
+
+task copyToLib( type: Copy) {
+    into "$buildDir/libs"
+    from configurations.runtime
+}
+
+jar {
+    dependsOn copyToLib
+
+    manifest {
+        attributes 'Main-Class': 'org.nosoft.bddownloader.BDDownloader'
+        def manifestClasspath = configurations.runtime.collect { it.getName() }.join(' ')
+        attributes 'Class-Path' : manifestClasspath
+    }
+}
