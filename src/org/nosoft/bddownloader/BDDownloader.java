@@ -37,10 +37,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mpatric.mp3agic.ID3v1;
 import com.mpatric.mp3agic.ID3v1Tag;
+import com.mpatric.mp3agic.ID3v2;
+import com.mpatric.mp3agic.ID3v24Tag;
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.NotSupportedException;
 import com.mpatric.mp3agic.UnsupportedTagException;
+
 
 
 public class BDDownloader {
@@ -210,7 +213,6 @@ public class BDDownloader {
 			   s.setTitle( fixTitleName(s.getTitle()));
 			   
 			   String name = String.format("%s/%d.%s.mp3", dirName, s.getTrackNumber(), s.getTitle());
-		//		   System.out.println("Downloading song [" + name +"]");
 			   
 			   DownloadTask task = new DownloadTask();
 			   task.destination = name;
@@ -225,7 +227,8 @@ public class BDDownloader {
 
 		   }
 		   
-		   String coverFile = String.format("%s/cover.jpg", dirName);
+		   String coverFile = String.format("%s/Folder.jpg", dirName);
+		 //String coverFile = String.format("%s/%s - %s.jpg", dirName, album.getArtist(), album.getTitle());
 		   DownloadTask coverTask = new DownloadTask();
 		   coverTask.setDownloadUrl(album.getConverUrl());
 		   coverTask.setDestination(coverFile);
@@ -309,10 +312,11 @@ public class BDDownloader {
 		   String dirName = String.format("%s - %s", album.getArtist(), album.getTitle());
 			
 		   ID3v1 id3v1Tag;
-		   
+ 		   ID3v2 id3v2Tag;
+
 		   String SUBFIX = "_temp"; 
 		   
-			System.out.print("\nupdating Id3 tags");
+		   System.out.print("\nupdating Id3 tags");
 			
 		for (Song song : album.songs ) {
 			   String name = String.format("%s/%d.%s.mp3", dirName, song.getTrackNumber(), song.getTitle());
@@ -321,6 +325,7 @@ public class BDDownloader {
 			try {
 				mp3file = new Mp3File(name);
 				if ( (!mp3file.hasId3v1Tag()) && (!mp3file.hasId3v2Tag()) ) {
+				      
 				      id3v1Tag = new ID3v1Tag();
 				      mp3file.setId3v1Tag(id3v1Tag);
 				      
@@ -330,11 +335,22 @@ public class BDDownloader {
 				      id3v1Tag.setAlbum(album.getTitle());
 				      id3v1Tag.setComment("By srtv");
 				    
+    				  id3v2Tag = new ID3v24Tag();
+				      mp3file.setId3v2Tag(id3v2Tag);
+				      
+				      id3v2Tag.setTrack(Integer.toString(song.getTrackNumber()));
+				      id3v2Tag.setArtist(album.getArtist());
+				      id3v2Tag.setTitle(song.getTitle());
+				      id3v2Tag.setAlbum(album.getTitle());
+				      id3v2Tag.setComment("By srtv");
+
 				      mp3file.save(name + SUBFIX);
 				      
 				      File oldFile = new File(name);
+				      System.gc(); // nasty trick to get the file deleted on windows
 				      oldFile.delete();
-				      				      
+				      System.gc();directory
+				      				      				     
 				      File newFile = new File(name+SUBFIX);
 				      newFile.renameTo(oldFile);
 					
@@ -362,6 +378,7 @@ public class BDDownloader {
 		
 		System.out.print("done.");
 		System.out.print("\n");
+		System.out.println("share the love :)");
 
 		
 	}
