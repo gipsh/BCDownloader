@@ -36,8 +36,10 @@ task copyToLib( type: Copy) {
     from configurations.runtime
 }
 
+
+
 jar {
-    dependsOn copyToLib
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 
     manifest {
         attributes 'Main-Class': 'org.nosoft.bddownloader.BDDownloader'
