@@ -349,7 +349,7 @@ public class BDDownloader {
 				      File oldFile = new File(name);
 				      System.gc(); // nasty trick to get the file deleted on windows
 				      oldFile.delete();
-				      System.gc();directory
+				      System.gc();
 				      				      				     
 				      File newFile = new File(name+SUBFIX);
 				      newFile.renameTo(oldFile);
