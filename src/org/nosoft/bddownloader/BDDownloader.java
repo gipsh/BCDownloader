@@ -154,16 +154,10 @@ public class BDDownloader {
 		    // Done with the file
 		    br.close();
 		    
-		    sb = new StringBuffer();
 		    Map<String,String> jsonMap = new HashMap<String,String >();
 		    
-		    Pattern p = Pattern.compile("(?i)(var\\s)(.+?)(\\s=\\s)(.+?)(;)");
 		    for (String var : vars) {
-		    	Matcher m = p.matcher(var);
-		    	if (m.find())  {
-		    		jsonMap.put(m.group(2), m.group(4));			    			
-		    	}
-		    	sb.append(var);
+		    		jsonMap.put(getVarName(var), getVarValue(var));			    					    		
 		    }
 
 		    Album album = new Album();
@@ -289,6 +283,14 @@ public class BDDownloader {
 		     }
 		  }
 		
+	}
+	
+	public String getVarValue(String line) {
+		return  line.substring( line.indexOf("{"), line.lastIndexOf("}")+1 );
+	}
+	
+	public String getVarName(String line) {
+		return 	line.substring( line.indexOf(" ")+1, line.indexOf("=")-1 );
 	}
 	
 	public  boolean isValidName(String text)
